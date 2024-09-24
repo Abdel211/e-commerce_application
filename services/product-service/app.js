@@ -4,12 +4,14 @@ const express = require('express');
 const mongoose = require('mongoose');
 const productRoutes = require('./src/routes/productRoutes');
 const categoryRoutes = require('./src/routes/categoryRoutes');
+const cartRoutes = require('./src/routes/cartRoutes');  
 
 const app = express();
 app.use(express.json());
 
 app.use('/products', productRoutes);
 app.use('/categories', categoryRoutes);
+app.use('/cart', cartRoutes); 
 
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
