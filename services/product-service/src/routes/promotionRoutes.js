@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const promotionController = require('../controllers/promotionController');
-const authMiddleware = require('../../user-service/src/middleware/authMiddleware');
+const authMiddleware = require('../../../user-service/src/middleware/authMiddleware');
 
 // Route pour créer une promotion (réservée aux admins)
 router.post('/create', authMiddleware.authenticateJWT, authMiddleware.verifyAdmin, promotionController.createPromotion);
