@@ -1,8 +1,7 @@
-// orderController.js
-
 const Order = require('../models/Order');
 const axios = require('axios');
 
+// Créer une commande
 exports.createOrder = async (req, res) => {
   try {
     const { userId, products } = req.body;
@@ -57,6 +56,7 @@ exports.createOrder = async (req, res) => {
   }
 };
 
+// Récupérer toutes les commandes
 exports.getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find();
@@ -66,6 +66,7 @@ exports.getAllOrders = async (req, res) => {
   }
 };
 
+// Récupérer une commande par ID
 exports.getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.orderId);
@@ -78,17 +79,28 @@ exports.getOrderById = async (req, res) => {
   }
 };
 
+// Mettre à jour le statut d'une commande
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
+
+    // Vérifier que le statut est valide
+    const validStatuses = ['En attente', 'En cours de traitement', 'Expédiée', 'Livrée', 'Annulée'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: 'Statut de commande invalide' });
+    }
+
+    // Mettre à jour le statut et la date de mise à jour
     const order = await Order.findByIdAndUpdate(
       req.params.orderId,
-      { status },
+      { status, updatedAt: Date.now() },
       { new: true }
     );
+
     if (!order) {
       return res.status(404).json({ message: 'Commande non trouvée' });
     }
+
     res.status(200).json({ message: 'Statut de la commande mis à jour', order });
   } catch (error) {
     res.status(500).json({ message: error.message });
