@@ -1,24 +1,27 @@
-import logo from './logo.svg';
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Profile from './pages/Profile';
+import Wishlist from './pages/Wishlist';
+import AddAddress from './pages/AddAddress';
+import UserOrders from './pages/UserOrders';
+import Header from './components/Header';  // Composant de navigation
 import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Header />
+      <Routes>
+        <Route path="/login" component={Login} />
+        <Route path="/register" component={Register} />
+        <Route path="/profile" component={Profile} />
+        <Route path="/wishlist" component={Wishlist} />
+        <Route path="/add-address" component={AddAddress} />
+        <Route path="/orders" component={UserOrders} />
+        </Routes>
+    </Router>
   );
 }
 
