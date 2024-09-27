@@ -1,42 +1,58 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
-const Profile = () => {
-  const [user, setUser] = useState(null);
-  const [message, setMessage] = useState('');
+function Profile() {
+  const [profile, setProfile] = useState({});
+  const [updatedUsername, setUpdatedUsername] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      const token = localStorage.getItem('token');
+    const fetchProfile = async () => {
       try {
-        const response = await fetch('http://localhost:3001/users/me', {
-          headers: {
-            Authorization: `Bearer ${token}`,  // Ajoute le token dans les en-têtes
-          },
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:3001/users/me', {
+          headers: { Authorization: `Bearer ${token}` },
         });
-        const data = await response.json();
-        if (response.ok) {
-          setUser(data);
-        } else {
-          setMessage(data.message || 'Erreur lors de la récupération des informations.');
-        }
+        setProfile(response.data);
+        setUpdatedUsername(response.data.username);
       } catch (error) {
-        setMessage('Erreur serveur');
+        setError('Failed to load profile.');
       }
     };
-
-    fetchUserData();
+    fetchProfile();
   }, []);
 
-  if (!user) return <div>Chargement...</div>;
+  const handleUpdate = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.put(
+        `http://localhost:3001/users/${profile._id}/profile`,
+        { username: updatedUsername },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setProfile((prev) => ({ ...prev, username: updatedUsername }));
+    } catch (error) {
+      setError('Update failed.');
+    }
+  };
 
   return (
-    <div className="container mt-5">
-      <h1>Profil Utilisateur</h1>
-      <p><strong>Nom d'utilisateur :</strong> {user.username}</p>
-      <p><strong>Email :</strong> {user.email}</p>
-      {/* Affiche d'autres infos comme les adresses ou la wishlist */}
+    <div>
+      <h2>Profile</h2>
+      {profile && (
+        <>
+          <p>Username: {profile.username}</p>
+          <input
+            type="text"
+            value={updatedUsername}
+            onChange={(e) => setUpdatedUsername(e.target.value)}
+          />
+          <button onClick={handleUpdate}>Update Profile</button>
+        </>
+      )}
+      {error && <p>{error}</p>}
     </div>
   );
-};
+}
 
 export default Profile;

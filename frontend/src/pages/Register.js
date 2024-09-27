@@ -1,36 +1,59 @@
 import React, { useState } from 'react';
-import { register } from '../services/userService';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const Register = () => {
-  const [formData, setFormData] = useState({ username: '', email: '', password: '' });
-  const [message, setMessage] = useState('');
+function Register() {
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await register(formData);
-      setMessage(response.message);
+      await axios.post('http://localhost:3001/users/register', {
+        username,
+        email,
+        password,
+      });
+      navigate('/login');  // Redirect to login page after successful registration
     } catch (error) {
-      setMessage(error);
+      console.error(error.response?.data); // Log l'erreur spécifique renvoyée par le serveur
+      setError(error.response?.data?.message || 'Registration failed.');
     }
   };
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
   return (
-    <div>
-      <h1>Inscription</h1>
+    <div className="register-container">
+      <h2>Register</h2>
       <form onSubmit={handleSubmit}>
-        <input type="text" name="username" placeholder="Nom d'utilisateur" onChange={handleChange} />
-        <input type="email" name="email" placeholder="Email" onChange={handleChange} />
-        <input type="password" name="password" placeholder="Mot de passe" onChange={handleChange} />
-        <button type="submit">S'inscrire</button>
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <button type="submit">Register</button>
+        {error && <p className="error">{error}</p>}
       </form>
-      {message && <p>{message}</p>}
     </div>
   );
-};
+}
 
 export default Register;
